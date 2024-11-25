@@ -1,0 +1,268 @@
+<div class="container mx-auto px-4 py-8">
+    <!-- Page Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">Bookings Management</h1>
+      <p class="mt-2 text-gray-600">Manage and track all your property bookings</p>
+    </div>
+  
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- Total Bookings -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-gray-600">Total Bookings</p>
+            <p class="text-2xl font-bold text-gray-900">{{totalBookings}}</p>
+          </div>
+          <span class="bg-blue-100 text-blue-800 p-2 rounded-lg">
+            <span class="material-icons">book_online</span>
+          </span>
+        </div>
+      </div>
+  
+      <!-- Total Revenue -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-gray-600">Total Revenue</p>
+            <p class="text-2xl font-bold text-gray-900">
+              ${{totalRevenue}}
+            </p>
+          </div>
+          <span class="bg-green-100 text-green-800 p-2 rounded-lg">
+            <span class="material-icons">payments</span>
+          </span>
+        </div>
+      </div>
+  
+      <!-- Average Booking Value -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-gray-600">Average Booking</p>
+            <p class="text-2xl font-bold text-gray-900">
+              ${{averageBookingValue}}
+            </p>
+          </div>
+          <span class="bg-purple-100 text-purple-800 p-2 rounded-lg">
+            <span class="material-icons">trending_up</span>
+          </span>
+        </div>
+      </div>
+  
+      <!-- Occupancy Rate -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-gray-600">Occupancy Rate</p>
+            <p class="text-2xl font-bold text-gray-900">
+              {{occupancyRate}}%
+            </p>
+          </div>
+          <span class="bg-yellow-100 text-yellow-800 p-2 rounded-lg">
+            <span class="material-icons">home</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow mb-8">
+      <form class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- Search -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Search
+            </label>
+            <input
+              type="text"
+              formControlName="search"
+              placeholder="Search guests, confirmation..."
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
+                     focus:border-airbnb">
+          </div>
+  
+          <!-- Status Filter -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
+            <select 
+              formControlName="status"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
+                     focus:border-airbnb">
+              <option value="all">All Statuses</option>
+              <option value="PENDING">Pending</option>
+              <option value="CONFIRMED">Confirmed</option>
+              <option value="CHECKED_IN">Checked In</option>
+              <option value="CHECKED_OUT">Checked Out</option>
+              <option value="CANCELLED">Cancelled</option>
+            </select>
+          </div>
+  
+          <!-- Date Range -->
+          <div formGroupName="dateRange">
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Check-in Date Range
+            </label>
+            <div class="flex space-x-2">
+              <input
+                type="date"
+                formControlName="start"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
+                       focus:border-airbnb">
+              <input
+                type="date"
+                formControlName="end"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
+                       focus:border-airbnb">
+            </div>
+          </div>
+  
+          <!-- Sort By -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Sort By
+            </label>
+            <select 
+              formControlName="sortBy"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
+                     focus:border-airbnb">
+              <option value="checkIn">Check-in Date</option>
+              <option value="price">Price</option>
+              <option value="status">Status</option>
+              <option value="guestName">Guest Name</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+  
+    <!-- Bookings Table -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <div class="min-w-full">
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="flex justify-center items-center py-12">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-airbnb">
+          </div>
+        </div>
+  
+        <!-- No Results State -->
+        <div *ngIf="!isLoading && filteredBookings.length === 0" 
+             class="text-center py-12">
+          <p class="text-gray-500 text-lg">No bookings found matching your criteria</p>
+        </div>
+  
+        <!-- Bookings List -->
+        <table *ngIf="!isLoading && filteredBookings.length > 0" 
+               class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Guest
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Check In
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Check Out
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Property
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Total
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Status
+              </th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+            </th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <tr *ngFor="let booking of filteredBookings">
+          <!-- Guest Info -->
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center">
+              <div>
+                <div class="text-sm font-medium text-gray-900">
+                  {{booking.guest.firstName}} {{booking.guest.lastName}}
+                </div>
+                <div class="text-sm text-gray-500">
+                  {{booking.guest.email}}
+                </div>
+                <div class="text-xs text-gray-500">
+                  Confirmation: {{booking.confirmationCode}}
+                </div>
+              </div>
+            </div>
+          </td>
+
+          <!-- Check In -->
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-gray-900">
+              {{booking.checkIn}}
+            </div>
+            <div class="text-xs text-gray-500">
+              {{booking.checkIn}}
+            </div>
+          </td>
+
+          <!-- Check Out -->
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-gray-900">
+              {{booking.checkOut}}
+            </div>
+            <div class="text-xs text-gray-500">
+              {{booking.checkOut}}
+            </div>
+           
+          </td>
+
+          <!-- Property -->
+          <td class="px-6 py-4 whitespace-nowrap"> 
+         
+          </td>
+
+          <!-- Total -->
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm font-medium text-gray-900">
+              ${{booking.price.totalPrice}}
+            </div>
+            <div class="text-xs text-gray-500">
+              Paid: {{booking.payment.status}}
+            </div>
+          </td>
+
+          <!-- Status -->
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span [class]="getStatusDisplay(booking.status).bgColor + ' ' + 
+                          getStatusDisplay(booking.status).textColor"
+                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+              {{getStatusDisplay(booking.status).label}}
+            </span>
+          </td>
+
+          <!-- Actions -->
+          <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <button 
+              (click)="viewBooking(booking.id)"
+              class="text-blue-600 hover:text-blue-900 px-2">
+              <span class="material-icons text-sm">visibility</span>
+            </button>
+            <button 
+              *ngIf="booking.status === 'PENDING' || booking.status === 'CONFIRMED'"
+              (click)="editBooking(booking.id)"
+              class="text-green-600 hover:text-green-900 px-2">
+              <span class="material-icons text-sm">edit</span>
+            </button>
+            
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>

@@ -1,1 +1,18 @@
 /* You can add global styles to this file, and also import other style files */
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+.text-airbnb {
+  color: #FF5A5F;
+}
+
+.bg-airbnb {
+  background-color: #FF5A5F;
+}
