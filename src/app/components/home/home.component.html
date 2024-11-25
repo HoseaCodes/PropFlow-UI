@@ -1,1 +1,103 @@
-<p>home works!</p>
+<!-- PropFlow-home.component.html -->
+<div class="min-h-screen font-sans">
+    <!-- Earnings Estimate Section -->
+    <section class="py-16 px-4">
+      <div class="max-w-4xl mx-auto text-center">
+        <h1 class="text-5xl font-semibold mb-8">Airbnb it.</h1>
+        <div class="bg-white rounded-2xl shadow-lg p-8">
+          <h2 class="text-3xl font-semibold mb-4">You could earn</h2>
+          <div class="text-6xl font-semibold tracking-tight mb-4">
+            ${{ estimate.totalEstimate }}
+          </div>
+          <div class="text-gray-600 mb-8">
+            {{ estimate.nights }} nights at an estimated ${{ estimate.nightlyRate }} a night
+          </div>
+          
+          <div class="max-w-md mx-auto">
+            <input 
+              type="range" 
+              [value]="selectedNights" 
+              min="1" 
+              max="30" 
+              (input)="updateNights($event)"
+              class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-rose-500"
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+  
+    <!-- Host Profiles Section -->
+    <section class="py-16 px-4 bg-gray-50">
+      <div class="max-w-7xl mx-auto">
+        <h2 class="text-3xl font-semibold text-center mb-12">
+          Need a place where you can host?<br>
+          Try Airbnb-friendly apartments
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+          <div *ngFor="let host of hosts" 
+               class="bg-white rounded-2xl overflow-hidden shadow-lg">
+            <img [src]="host.image" [alt]="host.name" 
+                 class="w-full h-64 object-cover">
+            <div class="p-6">
+              <h3 class="text-xl font-semibold mb-2">{{ host.name }}</h3>
+              <p class="text-gray-600">{{ host.role }} {{ host.location }}</p>
+            </div>
+          </div>
+        </div>
+  
+        <div class="text-center text-gray-600 max-w-2xl mx-auto">
+          <p class="mb-4">
+            The typical host earned <span class="font-semibold text-gray-900">$3650/year</span> 
+            and hosted 28 nights. *
+          </p>
+          <p class="text-sm">
+            *The typical Host earnings amount represents the median amount of earnings 
+            for Hosts in US PropFlow-friendly apartment buildings between Jan1 - Dec 31, 2023, 
+            according to internal PropFlow data for revenue earned by Hosts.
+          </p>
+        </div>
+      </div>
+    </section>
+  
+    <!-- FAQ Section -->
+    <section class="py-16 px-4">
+      <div class="max-w-3xl mx-auto">
+        <h2 class="text-3xl font-semibold mb-12">Your questions, answered</h2>
+        
+        <div class="space-y-4">
+          <div *ngFor="let item of faqItems; let i = index" 
+               class="border-b border-gray-200">
+            <button 
+              (click)="toggleFaq(i)"
+              class="w-full py-6 flex justify-between items-center text-left"
+            >
+              <h3 class="text-lg font-semibold">{{ item.question }}</h3>
+              <span class="transform transition-transform duration-200"
+                    [ngClass]="{'rotate-180': item.isOpen}">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </span>
+            </button>
+            
+            <div *ngIf="item.isOpen"
+                 class="pb-6 text-gray-600 transition-all duration-200">
+              {{ item.answer }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  
+    <!-- Call to Action Section -->
+    <section class="bg-gray-50 py-16 px-4">
+      <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-3xl font-semibold mb-8">Ready to PropFlow it?</h2>
+        <button class="bg-gradient-to-r from-rose-500 to-rose-600 text-white px-8 py-4 rounded-lg font-semibold hover:opacity-90 transition-opacity">
+          Get started
+        </button>
+      </div>
+    </section>
+  </div>
