@@ -7,13 +7,6 @@
           <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
           <p class="mt-1 text-gray-600">Overview of your Airbnb properties</p>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
-          <a href="http://localhost:4200/#/dashboard">Dashboard</a>
-          <a href="http://localhost:4200/bookings">Bookings</a>
-          <a href="http://localhost:4200/expenses">Expenses</a>
-          <a href="http://localhost:4200/properties">Property Lists</a>
-        </div>
-        
         <!-- Filters -->
         <form [formGroup]="filterForm" class="flex gap-4">
             <select formControlName="dateRange"
