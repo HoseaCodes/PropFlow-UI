@@ -9,11 +9,12 @@ import { AppComponent } from './app.component';
 import { PropertyListComponent } from './components/property-list/property-list.component';
 import { PropertyDetailsComponent } from './components/property-details/property-details.component';
 import { BookingsComponent } from './components/bookings/bookings.component';
-import { ExpensesComponent } from './components/expenses/expenses.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { HeaderComponent } from './core/layout/header/header.component';
 import { FooterComponent } from './core/layout/footer/footer.component';
 import { CommonModule } from '@angular/common';
+import { TransactionsComponent } from './components/transactions/transactions.component';
+import { ConfirmDialogComponent } from './shared/components/confirm-dialog/confirm-dialog.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { CommonModule } from '@angular/common';
     PropertyListComponent,
     PropertyDetailsComponent,
     BookingsComponent,
-    ExpensesComponent,
+    TransactionsComponent,
+    ConfirmDialogComponent,
     DashboardComponent,
     HeaderComponent,
     FooterComponent
@@ -39,7 +41,7 @@ import { CommonModule } from '@angular/common';
       { path: 'properties', component: PropertyListComponent },
       { path: 'properties/:id', component: PropertyDetailsComponent },
       { path: 'bookings', component: BookingsComponent },
-      { path: 'expenses', component: ExpensesComponent }
+      { path: 'transactions', component: TransactionsComponent }
     ])
   ],
   providers: [],

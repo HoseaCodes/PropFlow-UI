@@ -3,11 +3,11 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { BookingService } from '../../core/services/booking.service';
-import { ExpenseService } from '../../core/services/expense.service';
+// import { ExpenseService } from '../../core/services/expense.service';
 import { PropertyService } from '../../core/services/property.service';
 import { Property } from '../../models/property.model';
 import { Booking } from '../../models/booking.model';
-import { Expense } from '../../models/expense.model';
+// import { Expense } from '../../models/expense.model';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -79,7 +79,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   constructor(
     private bookingService: BookingService,
-    private expenseService: ExpenseService,
+    // private expenseService: ExpenseService,
     private propertyService: PropertyService,
     private fb: FormBuilder
   ) {
@@ -182,98 +182,98 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return { start, end };
   }
 
-  private calculateMetrics(bookings: Booking[], expenses: Expense[]): void {
-    // Calculate total revenue
-    this.totalRevenue = bookings.reduce(
-      (sum, booking) => sum + booking.price.totalPrice, 
-      0
-    );
+  // private calculateMetrics(bookings: Booking[], expenses: Expense[]): void {
+  //   // Calculate total revenue
+  //   this.totalRevenue = bookings.reduce(
+  //     (sum, booking) => sum + booking.price.totalPrice, 
+  //     0
+  //   );
 
-    // Calculate total expenses
-    this.totalExpenses = expenses.reduce(
-      (sum, expense) => sum + expense.amount, 
-      0
-    );
+  //   // Calculate total expenses
+  //   this.totalExpenses = expenses.reduce(
+  //     (sum, expense) => sum + expense.amount, 
+  //     0
+  //   );
 
-    // Calculate net profit
-    this.netProfit = this.totalRevenue - this.totalExpenses;
+  //   // Calculate net profit
+  //   this.netProfit = this.totalRevenue - this.totalExpenses;
 
-    // Calculate occupancy rate
-    const totalDays = bookings.reduce((sum, booking) => {
-      const days = Math.floor(
-        (new Date(booking.checkOut).getTime() - new Date(booking.checkIn).getTime()) 
-        / (1000 * 60 * 60 * 24)
-      );
-      return sum + days;
-    }, 0);
+  //   // Calculate occupancy rate
+  //   const totalDays = bookings.reduce((sum, booking) => {
+  //     const days = Math.floor(
+  //       (new Date(booking.checkOut).getTime() - new Date(booking.checkIn).getTime()) 
+  //       / (1000 * 60 * 60 * 24)
+  //     );
+  //     return sum + days;
+  //   }, 0);
 
-    const dateRange = this.getDateRange(this.filterForm.value.dateRange);
-    const totalPossibleDays = Math.floor(
-      (dateRange.end.getTime() - dateRange.start.getTime()) 
-      / (1000 * 60 * 60 * 24)
-    ) * this.properties.length;
+  //   const dateRange = this.getDateRange(this.filterForm.value.dateRange);
+  //   const totalPossibleDays = Math.floor(
+  //     (dateRange.end.getTime() - dateRange.start.getTime()) 
+  //     / (1000 * 60 * 60 * 24)
+  //   ) * this.properties.length;
 
-    this.occupancyRate = (totalDays / totalPossibleDays) * 100;
+  //   this.occupancyRate = (totalDays / totalPossibleDays) * 100;
 
-    // Calculate average nightly rate
-    this.averageNightlyRate = totalDays ? this.totalRevenue / totalDays : 0;
+  //   // Calculate average nightly rate
+  //   this.averageNightlyRate = totalDays ? this.totalRevenue / totalDays : 0;
 
-    // Calculate total bookings and cancellation rate
-    this.totalBookings = bookings.length;
-    const canceledBookings = bookings.filter(b => b.status === 'CANCELLED').length;
-    this.cancelationRate = (canceledBookings / this.totalBookings) * 100;
+  //   // Calculate total bookings and cancellation rate
+  //   this.totalBookings = bookings.length;
+  //   const canceledBookings = bookings.filter(b => b.status === 'CANCELLED').length;
+  //   this.cancelationRate = (canceledBookings / this.totalBookings) * 100;
 
-    // Calculate average rating
-    const ratingsSum = bookings.reduce(
-      (sum, booking) => sum + (booking.guestReview?.rating || 0), 
-      0
-    );
-    const totalRatings = bookings.filter(b => b.guestReview?.rating).length;
-    this.averageRating = totalRatings ? ratingsSum / totalRatings : 0;
-  }
+  //   // Calculate average rating
+  //   const ratingsSum = bookings.reduce(
+  //     (sum, booking) => sum + (booking.guestReview?.rating || 0), 
+  //     0
+  //   );
+  //   const totalRatings = bookings.filter(b => b.guestReview?.rating).length;
+  //   this.averageRating = totalRatings ? ratingsSum / totalRatings : 0;
+  // }
 
-  private prepareChartData(bookings: Booking[], expenses: Expense[]): void {
-    // Revenue Chart Data
-    this.revenueChartData = this.groupByMonth(bookings, b => b.price.totalPrice);
+  // private prepareChartData(bookings: Booking[], expenses: Expense[]): void {
+  //   // Revenue Chart Data
+  //   this.revenueChartData = this.groupByMonth(bookings, b => b.price.totalPrice);
 
-    // Occupancy Chart Data
-    this.occupancyChartData = this.calculateOccupancyByMonth(bookings);
+  //   // Occupancy Chart Data
+  //   this.occupancyChartData = this.calculateOccupancyByMonth(bookings);
 
-    // Expense Chart Data
-    this.expenseChartData = this.groupByCategory(expenses);
+  //   // Expense Chart Data
+  //   this.expenseChartData = this.groupByCategory(expenses);
 
-    // Booking Source Chart Data
-    this.bookingSourceChartData = this.groupBySource(bookings);
-  }
+  //   // Booking Source Chart Data
+  //   this.bookingSourceChartData = this.groupBySource(bookings);
+  // }
 
-  private calculatePropertyMetrics(bookings: Booking[], expenses: Expense[]): void {
-    this.propertyMetrics = this.properties.map(property => {
-      const propertyBookings = bookings.filter(b => b.propertyId === property.id);
-      const propertyExpenses = expenses.filter(e => e.propertyId === property.id);
+  // private calculatePropertyMetrics(bookings: Booking[], expenses: Expense[]): void {
+  //   this.propertyMetrics = this.properties.map(property => {
+  //     const propertyBookings = bookings.filter(b => b.propertyId === property.id);
+  //     const propertyExpenses = expenses.filter(e => e.propertyId === property.id);
 
-      const revenue = propertyBookings.reduce(
-        (sum, booking) => sum + booking.price.totalPrice, 
-        0
-      );
-      const expenseTotal = propertyExpenses.reduce(
-        (sum, expense) => sum + expense.amount, 
-        0
-      );
+  //     const revenue = propertyBookings.reduce(
+  //       (sum, booking) => sum + booking.price.totalPrice, 
+  //       0
+  //     );
+  //     const expenseTotal = propertyExpenses.reduce(
+  //       (sum, expense) => sum + expense.amount, 
+  //       0
+  //     );
 
-      return {
-        id: property.id,
-        name: property.name,
-        revenue,
-        expenses: expenseTotal,
-        profit: revenue - expenseTotal,
-        occupancyRate: this.calculatePropertyOccupancy(propertyBookings),
-        averageNightlyRate: this.calculateAverageNightlyRate(propertyBookings),
-        bookings: propertyBookings.length,
-        reviews: propertyBookings.filter(b => b.guestReview).length,
-        averageRating: this.calculateAverageRating(propertyBookings)
-      };
-    });
-  }
+  //     return {
+  //       id: property.id,
+  //       name: property.name,
+  //       revenue,
+  //       expenses: expenseTotal,
+  //       profit: revenue - expenseTotal,
+  //       occupancyRate: this.calculatePropertyOccupancy(propertyBookings),
+  //       averageNightlyRate: this.calculateAverageNightlyRate(propertyBookings),
+  //       bookings: propertyBookings.length,
+  //       reviews: propertyBookings.filter(b => b.guestReview).length,
+  //       averageRating: this.calculateAverageRating(propertyBookings)
+  //     };
+  //   });
+  // }
 
   private groupByMonth(data: any[], valueSelector: (item: any) => number): any[] {
     const grouped = data.reduce((acc, item) => {
@@ -294,17 +294,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return [];
   }
 
-  private groupByCategory(expenses: Expense[]): any[] {
-    const grouped = expenses.reduce((acc, expense) => {
-    //   acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
-      return acc;
-    }, {});
+  // private groupByCategory(expenses: Expense[]): any[] {
+  //   const grouped = expenses.reduce((acc, expense) => {
+  //   //   acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
+  //     return acc;
+  //   }, {});
 
-    return Object.entries(grouped).map(([category, amount]) => ({
-      category,
-      amount
-    }));
-  }
+  //   return Object.entries(grouped).map(([category, amount]) => ({
+  //     category,
+  //     amount
+  //   }));
+  // }
 
   private groupBySource(bookings: Booking[]): any[] {
     const grouped = bookings.reduce((acc, booking) => {

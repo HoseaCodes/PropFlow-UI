@@ -2,8 +2,8 @@ import { Routes } from '@angular/router';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { BookingsComponent } from './components/bookings/bookings.component';
 import { PropertyListComponent } from './components/property-list/property-list.component';
-import { ExpensesComponent } from './components/expenses/expenses.component';
 import { HomeComponent } from './components/home/home.component';
+import { TransactionsComponent } from './components/transactions/transactions.component';
 // import { authGuard } from './core/guards/auth.guard';
 // import { adminGuard } from './core/guards/admin.guard';
 
@@ -93,6 +93,6 @@ export const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
   { path: 'bookings', component: BookingsComponent },
   { path: 'properties', component: PropertyListComponent },
-  { path: 'expenses', component: ExpensesComponent },
+  { path: 'transactions', component: TransactionsComponent },
   { path: '**', redirectTo: '', pathMatch: 'full' } // Wildcard route for handling undefined routes
 ];

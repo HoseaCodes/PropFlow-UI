@@ -32,10 +32,10 @@ import { Component } from '@angular/core';
                  class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
                 Bookings
               </a>
-              <a href="/expenses" 
+              <a href="/transactions" 
                  routerLinkActive="text-gray-900"
                  class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
-                Expenses
+                Transactions
               </a>
               <a href="/properties" 
                  routerLinkActive="text-gray-900"

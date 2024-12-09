@@ -1,0 +1,530 @@
+<div class="container mx-auto px-4 py-8">
+    <!-- Page Header -->
+    <div class="flex justify-between items-center mb-8">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Transaction Management</h1>
+        <p class="mt-2 text-gray-600">Track and manage your income and expenses</p>
+      </div>
+      <button 
+        (click)="toggleTransactionForm()"
+        class="bg-airbnb hover:bg-airbnb-dark text-white px-6 py-2 rounded-lg 
+               transition duration-200">
+        {{showTransactionForm ? 'Cancel' : 'Add Transaction'}}
+      </button>
+      <!-- <div class="mt-4 space-x-4">
+        <button 
+          (click)="viewStorageState()"
+          class="px-4 py-2 bg-gray-500 text-white rounded">
+          View Storage State
+        </button>
+        <button 
+          (click)="clearStorage()"
+          class="px-4 py-2 bg-red-500 text-white rounded">
+          Clear Storage
+        </button>
+      </div> -->
+    </div>
+
+    <!-- Debug Panel (Development Only) -->
+    <div *ngIf="isDevelopment" 
+     class="fixed bottom-4 right-4 transition-all duration-300 z-50"
+     [class.translate-x-full]="!isDebugPanelOpen"
+     [class.translate-x-0]="isDebugPanelOpen">
+    
+        <!-- Toggle Button -->
+        <button 
+            (click)="isDebugPanelOpen = !isDebugPanelOpen"
+            class="absolute left-0 top-0 transform -translate-x-full mb-2 px-3 py-2 bg-gray-800 text-white rounded-l hover:bg-gray-700 transition-colors text-sm flex items-center"
+            [class.rounded-l]="isDebugPanelOpen"
+            [class.rounded]="!isDebugPanelOpen">
+            <span class="material-icons text-sm">
+            {{isDebugPanelOpen ? 'chevron_right' : 'bug_report'}}
+            </span>
+            <span class="ml-2" *ngIf="!isDebugPanelOpen">Debug</span>
+        </button>
+
+        <!-- Debug Panel Content -->
+        <div class="bg-gray-800 rounded-lg shadow-xl p-4 w-64">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-700">
+            <h3 class="text-white font-medium">Development Tools</h3>
+            <span class="text-xs text-gray-400">v1.0.0</span>
+            </div>
+
+            <!-- Actions -->
+            <div class="space-y-3">
+            <!-- View Storage -->
+            <button 
+                (click)="viewStorageState()"
+                class="w-full px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors flex items-center justify-between">
+                <div class="flex items-center">
+                <span class="material-icons mr-2 text-sm">storage</span>
+                <span>View Storage</span>
+                </div>
+                <span class="text-xs text-gray-400">⌘⇧V</span>
+            </button>
+
+            <!-- Copy Storage -->
+            <button 
+                (click)="copyStorageState()"
+                class="w-full px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors flex items-center">
+                <span class="material-icons mr-2 text-sm">content_copy</span>
+                Copy Storage
+            </button>
+
+            <!-- Clear Storage -->
+            <button 
+                (click)="confirmClearStorage()"
+                class="w-full px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 transition-colors flex items-center justify-between">
+                <div class="flex items-center">
+                <span class="material-icons mr-2 text-sm">delete</span>
+                <span>Clear Storage</span>
+                </div>
+                <span class="text-xs text-gray-200">⌘⇧C</span>
+            </button>
+            </div>
+
+            <!-- Keyboard Shortcuts -->
+            <div class="mt-4 pt-4 border-t border-gray-700">
+            <p class="text-xs text-gray-400 mb-2">Keyboard Shortcuts</p>
+            <div class="text-xs text-gray-500 space-y-1">
+                <div class="flex justify-between">
+                <span>Toggle Panel</span>
+                <span class="text-gray-400">⌘⇧D</span>
+                </div>
+                <div class="flex justify-between">
+                <span>View Storage</span>
+                <span class="text-gray-400">⌘⇧V</span>
+                </div>
+                <div class="flex justify-between">
+                <span>Clear Storage</span>
+                <span class="text-gray-400">⌘⇧C</span>
+                </div>
+            </div>
+            </div>
+
+            <!-- Environment Info -->
+            <div class="mt-4 pt-4 border-t border-gray-700">
+            <p class="text-xs text-gray-400">Environment Info</p>
+            <div class="text-xs text-gray-500 mt-2">
+                <div>Mode: Development</div>
+                <div>API: {{environment.useApi ? 'Enabled' : 'Local Storage'}}</div>
+                <div>Transactions: {{filteredTransactions.length}}</div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+
+  
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- Income -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-gray-600">Total Income</p>
+            <p class="text-2xl font-bold text-green-600">
+              ${{totalIncome | number:'1.0-0'}}
+            </p>
+          </div>
+          <span class="bg-green-100 text-green-800 p-2 rounded-lg">
+            <span class="material-icons">payments</span>
+          </span>
+        </div>
+      </div>
+  
+      <!-- Expenses -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-gray-600">Total Expenses</p>
+            <p class="text-2xl font-bold text-red-600">
+              ${{totalExpenses | number:'1.0-0'}}
+            </p>
+          </div>
+          <span class="bg-red-100 text-red-800 p-2 rounded-lg">
+            <span class="material-icons">payments</span>
+          </span>
+        </div>
+      </div>
+  
+      <!-- Net Income -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-gray-600">Net Income</p>
+            <p class="text-2xl font-bold" [class.text-green-600]="netIncome >= 0" 
+               [class.text-red-600]="netIncome < 0">
+              ${{netIncome | number:'1.0-0'}}
+            </p>
+          </div>
+          <span class="bg-blue-100 text-blue-800 p-2 rounded-lg">
+            <span class="material-icons">trending_up</span>
+          </span>
+        </div>
+      </div>
+  
+      <!-- Monthly Average -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-gray-600">Monthly Average</p>
+            <p class="text-2xl font-bold text-gray-900">
+              ${{monthlyAverage | number:'1.0-0'}}
+            </p>
+          </div>
+          <span class="bg-purple-100 text-purple-800 p-2 rounded-lg">
+            <span class="material-icons">date_range</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Transaction Form -->
+    <div *ngIf="showTransactionForm" class="bg-white rounded-lg shadow mb-8">
+      <div class="p-6">
+        <h2 class="text-xl font-semibold mb-4">
+          {{transactionForm.get('id')?.value ? 'Edit' : 'Add'}} Transaction
+        </h2>
+        
+        <form [formGroup]="transactionForm" (ngSubmit)="submitTransaction()" 
+              class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Transaction Type -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Type *
+            </label>
+            <select 
+              formControlName="type"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
+                     focus:border-airbnb">
+              <option value="">Select Type</option>
+              <option *ngFor="let type of transactionTypes" [value]="type">
+                {{type}}
+              </option>
+            </select>
+          </div>
+  
+          <!-- Property -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Property *
+            </label>
+            <select 
+              formControlName="propertyId"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
+                     focus:border-airbnb">
+              <option value="">Select Property</option>
+              <option *ngFor="let property of properties" [value]="property.id">
+                {{property.name}}
+              </option>
+            </select>
+          </div>
+  
+          <!-- Category -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Category *
+            </label>
+            <select 
+              formControlName="category"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
+                     focus:border-airbnb">
+              <option value="">Select Category</option>
+              <option *ngFor="let category of transactionCategories" [value]="category">
+                {{category}}
+              </option>
+            </select>
+          </div>
+  
+          <!-- Amount -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Amount *
+            </label>
+            <div class="relative">
+              <span class="absolute left-3 top-2 text-gray-500">$</span>
+              <input 
+                type="number"
+                formControlName="amount"
+                class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
+                       focus:border-airbnb"
+                min="0"
+                step="0.01">
+            </div>
+          </div>
+  
+          <!-- Date -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Date *
+            </label>
+            <input 
+              type="date"
+              formControlName="date"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
+                     focus:border-airbnb">
+          </div>
+  
+          <!-- Description -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Description *
+            </label>
+            <input 
+              type="text"
+              formControlName="description"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
+                     focus:border-airbnb">
+          </div>
+  
+          <!-- Recurring Settings -->
+          <div class="md:col-span-2">
+            <div class="flex items-center mb-2">
+              <input 
+                type="checkbox"
+                formControlName="recurring"
+                class="h-4 w-4 text-airbnb focus:ring-airbnb border-gray-300 rounded">
+              <label class="ml-2 text-sm font-medium text-gray-700">
+                Recurring Transaction
+              </label>
+            </div>
+            
+            <div *ngIf="transactionForm.get('recurring')?.value">
+              <select 
+                formControlName="frequency"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
+                       focus:border-airbnb">
+                <option value="">Select Frequency</option>
+                <option *ngFor="let frequency of transactionFrequencies" 
+                        [value]="frequency">
+                  {{frequency}}
+                </option>
+              </select>
+            </div>
+          </div>
+  
+          <!-- Form Actions -->
+          <div class="md:col-span-2 flex justify-end space-x-4">
+            <button 
+              type="button"
+              (click)="resetTransactionForm()"
+              class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 
+                     hover:bg-gray-50">
+              Cancel
+            </button>
+            <button 
+              type="submit"
+              [disabled]="transactionForm.invalid"
+              class="px-6 py-2 bg-airbnb text-white rounded-lg hover:bg-airbnb-dark 
+                     disabled:opacity-50 disabled:cursor-not-allowed">
+              {{transactionForm.get('id')?.value ? 'Update' : 'Save'}} Transaction
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Transaction Filters -->
+    <div class="bg-white rounded-lg shadow mb-8">
+        <form [formGroup]="filterForm" class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Search -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Search
+              </label>
+              <input
+                type="text"
+                formControlName="search"
+                placeholder="Search transactions..."
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
+                       focus:border-airbnb">
+            </div>
+      
+            <!-- Category Filter -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Category
+              </label>
+              <select 
+                formControlName="category"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
+                       focus:border-airbnb">
+                <option value="all">All Categories</option>
+                <option *ngFor="let category of transactionCategories" [value]="category">
+                  {{category}}
+                </option>
+              </select>
+            </div>
+      
+            <!-- Property Filter -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Property
+              </label>
+              <select 
+                formControlName="property"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
+                       focus:border-airbnb">
+                <option value="all">All Properties</option>
+                <option *ngFor="let property of properties" [value]="property.id">
+                  {{property.name}}
+                </option>
+              </select>
+            </div>
+      
+            <!-- Date Range -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Date Range
+              </label>
+              <div class="flex space-x-2">
+                <input
+                  type="date"
+                  formControlName="startDate"
+                  class="w-1/2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
+                         focus:border-airbnb">
+                <input
+                  type="date"
+                  formControlName="endDate"
+                  class="w-1/2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
+                         focus:border-airbnb">
+              </div>
+            </div>
+      
+            <!-- Amount Range -->
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Amount Range
+              </label>
+              <div class="flex space-x-2">
+                <div class="relative w-1/2">
+                  <span class="absolute left-3 top-2 text-gray-500">$</span>
+                  <input
+                    type="number"
+                    formControlName="minAmount"
+                    placeholder="Min"
+                    class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
+                           focus:border-airbnb">
+                </div>
+                <div class="relative w-1/2">
+                  <span class="absolute left-3 top-2 text-gray-500">$</span>
+                  <input
+                    type="number"
+                    formControlName="maxAmount"
+                    placeholder="Max"
+                    class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
+                           focus:border-airbnb">
+                </div>
+              </div>
+            </div>
+      
+            <!-- Sort -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Sort By
+              </label>
+              <select 
+                formControlName="sortBy"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
+                       focus:border-airbnb">
+                <option value="date">Date</option>
+                <option value="amount">Amount</option>
+                <option value="category">Category</option>
+              </select>
+            </div>
+      
+            <!-- Reset Filters Button -->
+            <div class="md:col-span-2 lg:col-span-4 flex justify-end">
+              <button
+                type="button"
+                (click)="resetFilters()"
+                class="px-4 py-2 text-gray-600 hover:text-gray-900">
+                Reset Filters
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+  
+    <!-- Transactions List -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="flex justify-center items-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-airbnb"></div>
+      </div>
+  
+      <!-- Empty State -->
+      <div *ngIf="!isLoading && filteredTransactions.length === 0" 
+           class="text-center py-12">
+        <p class="text-gray-500 text-lg">No transactions found</p>
+      </div>
+  
+      <!-- Transactions Table -->
+      <table *ngIf="!isLoading && filteredTransactions.length > 0" 
+             class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Date
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Type
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Category
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Description
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Property
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Amount
+            </th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let transaction of filteredTransactions">
+            <td class="px-6 py-4 whitespace-nowrap">
+              {{transaction.date | date}}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span [class]="transaction.type === 'INCOME' ? 'text-green-600' : 'text-red-600'">
+                {{transaction.type}}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              {{transaction.category}}
+            </td>
+            <td class="px-6 py-4">
+              {{transaction.description}}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              {{transaction.propertyName}}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span [class]="transaction.type === 'INCOME' ? 'text-green-600' : 'text-red-600'">
+                ${{transaction.amount}}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right">
+              <button class="text-blue-600 hover:text-blue-900 mr-3">
+                Edit
+              </button>
+              <button 
+                (click)="deleteTransaction(transaction)"
+                class="text-red-600 hover:text-red-900 transition duration-200">
+                Delete
+            </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
