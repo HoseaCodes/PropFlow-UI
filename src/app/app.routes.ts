@@ -4,6 +4,10 @@ import { BookingsComponent } from './components/bookings/bookings.component';
 import { PropertyListComponent } from './components/property-list/property-list.component';
 import { HomeComponent } from './components/home/home.component';
 import { TransactionsComponent } from './components/transactions/transactions.component';
+import { SignInComponent } from './components/auth/sign-in.component';
+import { SignUpComponent } from './components/auth/sign-up.component';
+import { AuthGuard } from './core/guards/auth.guard';
+// import { PropertyDetailsComponent } from './components/property-details/property-details.component';
 // import { authGuard } from './core/guards/auth.guard';
 // import { adminGuard } from './core/guards/admin.guard';
 
@@ -89,10 +93,15 @@ import { TransactionsComponent } from './components/transactions/transactions.co
 // //   }
 // ];
 export const routes: Routes = [
-  { path: '', component: HomeComponent },
-  { path: 'dashboard', component: DashboardComponent },
-  { path: 'bookings', component: BookingsComponent },
-  { path: 'properties', component: PropertyListComponent },
-  { path: 'transactions', component: TransactionsComponent },
+  { path: '', component: HomeComponent, pathMatch: 'full' },
+  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
+  { path: 'properties', component: PropertyListComponent, canActivate: [AuthGuard] },
+  // { path: 'properties/:id', component: PropertyDetailsComponent, canActivate: [AuthGuard] },
+  { path: 'bookings', component: BookingsComponent, canActivate: [AuthGuard] },
+  { path: 'transactions', component: TransactionsComponent, canActivate: [AuthGuard] },
+  { path: 'signin', component: SignInComponent },
+  { path: 'signup', component: SignUpComponent },
+  { path: 'logout', redirectTo: '/signin', pathMatch: 'full' },
   { path: '**', redirectTo: '', pathMatch: 'full' } // Wildcard route for handling undefined routes
 ];
+

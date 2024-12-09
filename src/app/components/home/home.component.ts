@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 interface EstimateData {
   nights: number;
@@ -13,6 +14,8 @@ interface EstimateData {
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
+  constructor(private router: Router) {}
+
   estimate: EstimateData = {
     nights: 7,
     nightlyRate: 188,
@@ -60,8 +63,6 @@ export class HomeComponent {
 
   selectedNights: string = '7';
 
-  constructor() {}
-
   ngOnInit(): void {}
 
   updateNights(event: Event): void {
@@ -77,5 +78,9 @@ export class HomeComponent {
 
   private calculateEstimate(): void {
     this.estimate.totalEstimate = this.estimate.nights * this.estimate.nightlyRate;
+  }
+
+  navigateToSignUp() {
+    this.router.navigateByUrl('/signup');
   }
 }

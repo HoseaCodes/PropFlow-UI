@@ -94,6 +94,7 @@
   
   export interface Transaction {
     id?: number;
+    userId: string;
     propertyId: number;
     propertyName: string;
     bookingReference?: string; // If expense is related to a specific booking

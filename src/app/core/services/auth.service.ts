@@ -1,33 +1,74 @@
+// auth.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { environment } from '../../../environments/environment';
+import { BehaviorSubject } from 'rxjs';
+import { User } from '../../models/user.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private currentUserSubject = new BehaviorSubject<any>(null);
-  public currentUser$ = this.currentUserSubject.asObservable();
-  public isAuthenticated$ = this.currentUser$.pipe(map(user => !!user));
-  public redirectUrl: string | null = null;
+  private currentUserSubject = new BehaviorSubject<User | null>(null);
 
-  constructor(private http: HttpClient) {
-    // Check for stored user token on init
+  constructor() {
+    // Load user from local storage on service initialization
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
       this.currentUserSubject.next(JSON.parse(storedUser));
     }
   }
 
-  // login(email: string, password: string): Observable<any> {
-  //   return this.http.post<any>(`${environment.apiUrl}/auth/login`, { email, password })
-  //     .pipe(map(response => {
-  //       // Store user details and token
-  //       localStorage.setItem('currentUser', JSON.stringify(response));
-  //       this.currentUserSubject.next(response);
-  //       return response;
-  //     }));
-  // }
+  signUp(user: User): boolean {
+    // Check if user already exists
+    const existingUsers = this.getUsers();
+    const userExists = existingUsers.some(u => u.email === user.email);
+    
+    if (userExists) {
+      return false;
+    }
+
+    // Generate unique ID
+    user.id = this.generateUniqueId();
+    
+    // Save user to local storage
+    const updatedUsers = [...existingUsers, user];
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    
+    // Set current user
+    this.currentUserSubject.next(user);
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    
+    return true;
+  }
+
+  signIn(email: string, password: string): boolean {
+    const users = this.getUsers();
+    const user = users.find(u => u.email === email && u.password === password);
+    
+    if (user) {
+      this.currentUserSubject.next(user);
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      return true;
+    }
+    
+    return false;
+  }
+
+  signOut(): void {
+    this.currentUserSubject.next(null);
+    localStorage.removeItem('currentUser');
+  }
+
+  getCurrentUser() {
+    return this.currentUserSubject.asObservable();
+  }
+
+  private getUsers(): User[] {
+    const usersJson = localStorage.getItem('users');
+    return usersJson ? JSON.parse(usersJson) : [];
+  }
+
+  private generateUniqueId(): string {
+    return Math.random().toString(36).substring(2, 15) +
+           Math.random().toString(36).substring(2, 15);
+  }
 }

@@ -3,10 +3,11 @@ import {
   CanActivate, 
   ActivatedRouteSnapshot, 
   RouterStateSnapshot, 
+  UrlTree, 
   Router 
 } from '@angular/router';
-import { AuthService } from '../services/auth.service';
 import { Observable } from 'rxjs';
+import { AuthService } from '../services/auth.service';
 import { map, take } from 'rxjs/operators';
 
 @Injectable({
@@ -14,29 +15,25 @@ import { map, take } from 'rxjs/operators';
 })
 export class AuthGuard implements CanActivate {
   constructor(
-    private authService: AuthService,
+    private authService: AuthService, 
     private router: Router
   ) {}
 
   canActivate(
-    route: ActivatedRouteSnapshot,
+    route: ActivatedRouteSnapshot, 
     state: RouterStateSnapshot
-  ): Observable<boolean> | boolean {
-    return this.authService.isAuthenticated$.pipe(
+  ): Observable<boolean | UrlTree> {
+    return this.authService.getCurrentUser().pipe(
       take(1),
-      map(isAuthenticated => {
-        if (isAuthenticated) {
+      map(user => {
+        if (user) {
           return true;
         }
-
-        // Store attempted URL for redirecting after login
-        this.authService.redirectUrl = state.url;
         
-        // Navigate to login
-        this.router.navigate(['/auth/login'], {
+        // Redirect to signin page with return url
+        return this.router.createUrlTree(['/signin'], {
           queryParams: { returnUrl: state.url }
         });
-        return false;
       })
     );
   }

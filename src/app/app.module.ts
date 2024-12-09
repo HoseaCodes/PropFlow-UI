@@ -15,6 +15,9 @@ import { FooterComponent } from './core/layout/footer/footer.component';
 import { CommonModule } from '@angular/common';
 import { TransactionsComponent } from './components/transactions/transactions.component';
 import { ConfirmDialogComponent } from './shared/components/confirm-dialog/confirm-dialog.component';
+import { SignInComponent } from './components/auth/sign-in.component';
+import { SignUpComponent } from './components/auth/sign-up.component';
+import { routes } from './app.routes';
 
 @NgModule({
   declarations: [
@@ -23,6 +26,8 @@ import { ConfirmDialogComponent } from './shared/components/confirm-dialog/confi
     PropertyDetailsComponent,
     BookingsComponent,
     TransactionsComponent,
+    SignInComponent,
+    SignUpComponent,
     ConfirmDialogComponent,
     DashboardComponent,
     HeaderComponent,
@@ -35,14 +40,9 @@ import { ConfirmDialogComponent } from './shared/components/confirm-dialog/confi
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    RouterModule.forRoot([
-      { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-      { path: 'dashboard', component: DashboardComponent },
-      { path: 'properties', component: PropertyListComponent },
-      { path: 'properties/:id', component: PropertyDetailsComponent },
-      { path: 'bookings', component: BookingsComponent },
-      { path: 'transactions', component: TransactionsComponent }
-    ])
+    RouterModule.forRoot(
+      routes
+    )
   ],
   providers: [],
   bootstrap: [AppComponent]

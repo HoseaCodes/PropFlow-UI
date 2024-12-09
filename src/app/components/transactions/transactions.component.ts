@@ -134,6 +134,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     return [
       {
         id: 1,
+        userId: '',
         type: TransactionType.EXPENSE,
         category: TransactionCategory.MAINTENANCE,
         description: 'Plumbing repair',
@@ -164,6 +165,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
           const mockTransactions: Transaction[] = [
                     {
                       id: 1,
+                      userId: '',
                       type: TransactionType.EXPENSE,
                       category: TransactionCategory.MAINTENANCE,
                       description: 'Plumbing repair',
@@ -180,6 +182,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
                     },
                     {
                       id: 2,
+                      userId: '',
                       type: TransactionType.EXPENSE,
                       category: TransactionCategory.UTILITIES,
                       description: 'Electricity bill',
@@ -196,6 +199,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
                     },
                     {
                       id: 3,
+                      userId: '',
                       type: TransactionType.INCOME,
                       category: TransactionCategory.BOOKING_PAYMENT,
                       description: 'Monthly rent',
@@ -244,43 +248,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       });
   }
 
-  // private applyFilters(): void {
-  //   const filters = this.filterForm.value;
-    
-  //   this.filteredTransactions = this.transactions.filter(transaction => {
-  //     // Search filter
-  //     const searchTerm = filters.search.toLowerCase();
-  //     const matchesSearch = !searchTerm || 
-  //       transaction.description.toLowerCase().includes(searchTerm) ||
-  //       transaction.vendor?.toLowerCase().includes(searchTerm);
-
-  //     // Type filter
-  //     const matchesType = filters.type === 'all' || 
-  //       transaction.type === filters.type;
-
-  //     // Category filter
-  //     const matchesCategory = filters.category === 'all' || 
-  //       transaction.category === filters.category;
-
-  //     // Property filter
-  //     const matchesProperty = filters.property === 'all' || 
-  //       transaction.propertyId.toString() === filters.property;
-
-  //     // Date range filter
-  //     const transactionDate = new Date(transaction.date);
-  //     const matchesDateRange = (!filters.startDate || transactionDate >= new Date(filters.startDate)) &&
-  //       (!filters.endDate || transactionDate <= new Date(filters.endDate));
-
-  //     // Amount range filter
-  //     const matchesAmount = (!filters.minAmount || transaction.amount >= filters.minAmount) &&
-  //       (!filters.maxAmount || transaction.amount <= filters.maxAmount);
-
-  //     return matchesSearch && matchesType && matchesCategory && 
-  //            matchesProperty && matchesDateRange && matchesAmount;
-  //   });
-
-  //   this.sortTransactions(filters.sortBy);
-  // }
   private applyFilters(): void {
     const filters = this.filterForm.value;
     
@@ -368,9 +335,32 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
   submitTransaction(): void {
     if (this.transactionForm.valid) {
+      // Retrieve the currentUser object from local storage
+      const currentUser = localStorage.getItem('currentUser');
+      let userId = '';
+
+      if (currentUser) {
+        try {
+          const parsedUser = JSON.parse(currentUser);
+          userId = parsedUser.id;
+        } catch (error) {
+          console.error('Error parsing currentUser from localStorage:', error);
+          this.snackBar.open('Error retrieving user information.', 'Close', {
+            duration: 3000,
+          });
+          return;
+        }
+      }
+      if (!userId) {
+        this.snackBar.open('Unable to retrieve user information.', 'Close', {
+          duration: 3000,
+        });
+        return;
+      }
       const transactionData = {
         ...this.transactionForm.value,
-        propertyName: this.properties.find(p => p.id === this.transactionForm.value.propertyId)?.name
+        propertyName: this.properties.find(p => p.id === this.transactionForm.value.propertyId)?.name,
+        userId
       };
   
       this.transactionService.createTransaction(transactionData).subscribe({
