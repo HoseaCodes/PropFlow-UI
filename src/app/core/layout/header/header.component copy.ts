@@ -1,12 +1,12 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { User } from '../../../models/user.model';
 import { AuthService } from '../../services/auth.service';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-layout-header',
   imports: [
-    CommonModule
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
