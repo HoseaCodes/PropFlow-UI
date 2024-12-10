@@ -187,9 +187,8 @@
           {{transactionForm.get('id')?.value ? 'Edit' : 'Add'}} Transaction
         </h2>
         
-        <form [formGroup]="transactionForm" (ngSubmit)="submitTransaction()" 
-              class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Transaction Type -->
+        <form [formGroup]="transactionForm" (ngSubmit)="submitTransaction()" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Basic Transaction Info -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">
               Type *
@@ -204,120 +203,220 @@
               </option>
             </select>
           </div>
-  
-          <!-- Property -->
+        
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              Property *
-            </label>
-            <select 
-              formControlName="propertyId"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
-                     focus:border-airbnb">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Property *</label>
+            <select formControlName="propertyId"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb">
               <option value="">Select Property</option>
-              <option *ngFor="let property of properties" [value]="property.id">
-                {{property.name}}
-              </option>
+              <option *ngFor="let property of properties" [value]="property.id">{{property.name}}</option>
             </select>
           </div>
-  
-          <!-- Category -->
+        
+          <!-- Category and Subcategory -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              Category *
-            </label>
-            <select 
-              formControlName="category"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
-                     focus:border-airbnb">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+            <select formControlName="category"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb">
               <option value="">Select Category</option>
-              <option *ngFor="let category of transactionCategories" [value]="category">
-                {{category}}
-              </option>
+              <option *ngFor="let category of transactionCategories" [value]="category">{{category}}</option>
             </select>
           </div>
-  
-          <!-- Amount -->
+        
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              Amount *
-            </label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Subcategory</label>
+            <input type="text" formControlName="subcategory"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb">
+          </div>
+        
+          <!-- Amount and Status -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Amount *</label>
             <div class="relative">
               <span class="absolute left-3 top-2 text-gray-500">$</span>
-              <input 
-                type="number"
-                formControlName="amount"
-                class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
-                       focus:border-airbnb"
-                min="0"
-                step="0.01">
+              <input type="number" formControlName="amount"
+                     class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb"
+                     min="0" step="0.01">
             </div>
           </div>
-  
-          <!-- Date -->
+        
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              Date *
-            </label>
-            <input 
-              type="date"
-              formControlName="date"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
-                     focus:border-airbnb">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <select formControlName="status"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb">
+              <option value="PENDING">Pending</option>
+              <option value="PAID">Paid</option>
+              <option value="CANCELLED">Cancelled</option>
+            </select>
           </div>
-  
+        
+          <!-- Dates -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Date *</label>
+            <input type="date" formControlName="date"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb">
+          </div>
+        
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+            <input type="date" formControlName="dueDate"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb">
+          </div>
+        
           <!-- Description -->
           <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              Description *
-            </label>
-            <input 
-              type="text"
-              formControlName="description"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
-                     focus:border-airbnb">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+            <input type="text" formControlName="description"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb">
           </div>
-  
-          <!-- Recurring Settings -->
-          <div class="md:col-span-2">
-            <div class="flex items-center mb-2">
-              <input 
-                type="checkbox"
-                formControlName="recurring"
-                class="h-4 w-4 text-airbnb focus:ring-airbnb border-gray-300 rounded">
-              <label class="ml-2 text-sm font-medium text-gray-700">
-                Recurring Transaction
-              </label>
+        
+          <!-- Booking Information -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Booking Reference</label>
+            <input type="text" formControlName="bookingReference"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb">
+          </div>
+        
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Booking ID</label>
+            <input type="number" formControlName="bookingId"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb">
+          </div>
+        
+          <!-- Payment Information -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
+            <select formControlName="paymentMethod"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb">
+              <option value="">Select Payment Method</option>
+              <option value="CREDIT_CARD">Credit Card</option>
+              <option value="BANK_TRANSFER">Bank Transfer</option>
+              <option value="CASH">Cash</option>
+            </select>
+          </div>
+        
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Payment Reference</label>
+            <input type="text" formControlName="paymentReference"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb">
+          </div>
+        
+          <!-- Vendor Information -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Vendor</label>
+            <input type="text" formControlName="vendor"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb">
+          </div>
+        
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Receipt URL</label>
+            <input type="text" formControlName="receiptUrl"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb">
+          </div>
+        
+          <!-- Tax Details Section -->
+          <div class="md:col-span-2 p-4 border rounded-lg" formGroupName="taxDetails">
+            <h3 class="font-medium mb-4">Tax Details</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="flex items-center">
+                <input type="checkbox" formControlName="taxable" class="h-4 w-4 text-airbnb focus:ring-airbnb border-gray-300 rounded">
+                <label class="ml-2">Taxable</label>
+              </div>
+        
+              <div class="flex items-center">
+                <input type="checkbox" formControlName="deductible" class="h-4 w-4 text-airbnb focus:ring-airbnb border-gray-300 rounded">
+                <label class="ml-2">Deductible</label>
+              </div>
+        
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tax Category</label>
+                <input type="text" formControlName="taxCategory"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb">
+              </div>
+        
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tax Amount</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-2 text-gray-500">$</span>
+                  <input type="number" formControlName="taxAmount"
+                         class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb"
+                         step="0.01">
+                </div>
+              </div>
+        
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Deduction Category</label>
+                <input type="text" formControlName="deductionCategory"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb">
+              </div>
             </div>
-            
-            <div *ngIf="transactionForm.get('recurring')?.value">
-              <select 
-                formControlName="frequency"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb 
-                       focus:border-airbnb">
-                <option value="">Select Frequency</option>
-                <option *ngFor="let frequency of transactionFrequencies" 
-                        [value]="frequency">
-                  {{frequency}}
-                </option>
+          </div>
+        
+          <!-- Approval Information -->
+          <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Approval Status</label>
+              <select formControlName="approvalStatus"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb">
+                <option value="PENDING">Pending</option>
+                <option value="APPROVED">Approved</option>
+                <option value="REJECTED">Rejected</option>
               </select>
             </div>
+        
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Approved By</label>
+              <input type="text" formControlName="approvedBy"
+                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb">
+            </div>
+        
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Approval Date</label>
+              <input type="datetime-local" formControlName="approvedDate"
+                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb">
+            </div>
           </div>
-  
+        
+          <!-- Tags -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tags (comma-separated)</label>
+            <input type="text" formControlName="tags"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb"
+                   placeholder="summer, luxury, vip">
+          </div>
+        
+          <!-- Notes -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+            <textarea formControlName="notes" rows="3"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb"></textarea>
+          </div>
+        
+          <!-- Metadata -->
+          <div class="md:col-span-2" formGroupName="metadata">
+            <h3 class="font-medium mb-4">Metadata</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Source</label>
+                <input type="text" formControlName="source"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Campaign</label>
+                <input type="text" formControlName="campaign"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-airbnb focus:border-airbnb">
+              </div>
+            </div>
+          </div>
+        
           <!-- Form Actions -->
           <div class="md:col-span-2 flex justify-end space-x-4">
-            <button 
-              type="button"
-              (click)="resetTransactionForm()"
-              class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 
-                     hover:bg-gray-50">
+            <button type="button" (click)="resetTransactionForm()"
+                    class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
               Cancel
             </button>
-            <button 
-              type="submit"
-              [disabled]="transactionForm.invalid"
-              class="px-6 py-2 bg-airbnb text-white rounded-lg hover:bg-airbnb-dark 
-                     disabled:opacity-50 disabled:cursor-not-allowed">
+            <button type="submit" [disabled]="transactionForm.invalid"
+                    class="px-6 py-2 bg-airbnb text-white rounded-lg hover:bg-airbnb-dark disabled:opacity-50 disabled:cursor-not-allowed">
               {{transactionForm.get('id')?.value ? 'Update' : 'Save'}} Transaction
             </button>
           </div>
@@ -514,7 +613,9 @@
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right">
-              <button class="text-blue-600 hover:text-blue-900 mr-3">
+              <button 
+                (click)="editTransaction(transaction)"
+              class="text-blue-600 hover:text-blue-900 mr-3">
                 Edit
               </button>
               <button 

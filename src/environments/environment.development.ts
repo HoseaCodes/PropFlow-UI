@@ -3,5 +3,6 @@ export const environment = {
     apiUrl: 'http://localhost:8080/api',
     jwtTokenKey: 'hosthaven_token',
     useApi: true,
-    isDevelopment: true
+    isDevelopment: true,
+    useLocalBackend: true
 };

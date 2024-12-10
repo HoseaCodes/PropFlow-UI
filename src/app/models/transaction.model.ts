@@ -98,7 +98,7 @@
     propertyId: number;
     propertyName: string;
     bookingReference?: string; // If expense is related to a specific booking
-    // bookingId?: number; // If expense is related to a specific booking
+    bookingId?: number; // If expense is related to a specific booking
 
     // Basic Information
     type: TransactionType;
@@ -108,11 +108,13 @@
     amount: number;
     
     // Status and Payment
-    status?: TransactionStatus;
-    paymentMethod?: PaymentMethod;
+    // status?: TransactionStatus;
+    status?: string;
+    // paymentMethod?: PaymentMethod;
+    paymentMethod?: string;
     paymentReference?: string;
     recurring: boolean;
-    frequency?: TransactionFrequency;
+    frequency?: TransactionFrequency | null;
 
     // Related Entities
     vendor?: string;
@@ -132,7 +134,8 @@
     }[];
 
     // Approval Workflow
-    approvalStatus?: 'PENDING' | 'APPROVED' | 'REJECTED';
+    // approvalStatus?: 'PENDING' | 'APPROVED' | 'REJECTED';
+    approvalStatus?: string;
     approvedBy?: string;
     approvedDate?: Date;
   
@@ -166,6 +169,9 @@
     minAmount?: number;
     maxAmount?: number;
     searchTerm?: string;
+    page?: any;
+    size?: any;
+    sortBy?: 'date' | 'amount';
   }
   
   export interface TransactionSummary {

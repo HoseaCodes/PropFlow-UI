@@ -1,5 +1,3 @@
-// src/app/components/transactions/transactions.component.ts
-
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
@@ -41,6 +39,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   isDebugPanelOpen = false;
   useApi = environment.useApi;
   environment = environment;
+  isEdit = false;
+  transId: any;
   
   // Enums for template
   transactionTypes = Object.values(TransactionType);
@@ -79,10 +79,53 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   }
 
   private initializeForms(): void {
-    // Filter Form
+    // Initialize transaction form with default values
+    this.transactionForm = this.fb.group({
+      // Default values for main selects
+      type: ['INCOME', Validators.required],
+      propertyId: [1, Validators.required],
+      propertyName: ['Luxury Villa'],
+      category: ['BOOKING_PAYMENT', Validators.required],
+
+      // Rest of the form fields
+      bookingReference: [''],
+      bookingId: [''],
+      subcategory: [''],
+      description: ['', Validators.required],
+      amount: ['', [Validators.required, Validators.min(0)]],
+      status: ['PENDING'],
+      paymentMethod: [''],
+      paymentReference: [''],
+      recurring: [false],
+      frequency: [''],
+      vendor: [''],
+      receiptUrl: [''],
+      notes: [''],
+      approvalStatus: ['PENDING'],
+      approvedBy: [''],
+      approvedDate: [''],
+      date: [new Date().toISOString().split('T')[0], Validators.required],
+      dueDate: [''],
+      tags: [''],
+
+      // Initialize nested form groups properly
+      taxDetails: this.fb.group({
+        taxable: [false],
+        taxCategory: [''],
+        taxAmount: [0],
+        deductible: [false],
+        deductionCategory: ['']
+      }),
+
+      metadata: this.fb.group({
+        source: ['web'],
+        campaign: ['']
+      })
+    });
+
+    // Initialize filter form
     this.filterForm = this.fb.group({
       search: [''],
-      type: ['all'],
       category: ['all'],
       property: ['all'],
       startDate: [''],
@@ -92,21 +135,17 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       sortBy: ['date']
     });
 
-    // Transaction Form
-    this.transactionForm = this.fb.group({
-      type: ['', Validators.required],
-      propertyId: ['', Validators.required],
-      category: ['', Validators.required],
-      description: ['', Validators.required],
-      amount: ['', [Validators.required, Validators.min(0)]],
-      date: ['', Validators.required],
-      recurring: [false],
-      frequency: [{ value: '', disabled: true }],
-      notes: [''],
-      vendor: [''],
-      bookingReference: ['']
+    // Update propertyName when propertyId changes
+    this.transactionForm.get('propertyId')?.valueChanges.subscribe((propertyId: number) => {
+      const selectedProperty = this.properties.find(p => p.id === propertyId);
+      if (selectedProperty) {
+        this.transactionForm.patchValue({
+          propertyName: selectedProperty.name
+        }, { emitEvent: false });
+      }
     });
   }
+
 
   private loadProperties(): void {
     const mockProperties: Property[] = [
@@ -157,7 +196,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.transactionService.getTransactions().subscribe({
       next: (transactions) => {
-        console.log('Transactions loaded:', transactions);
         // If no transactions received, use mock data
         if (transactions.length === 0) {
           this.transactions = this.getMockTransactions();
@@ -335,56 +373,66 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
   submitTransaction(): void {
     if (this.transactionForm.valid) {
-      // Retrieve the currentUser object from local storage
-      const currentUser = localStorage.getItem('currentUser');
-      let userId = '';
-
-      if (currentUser) {
-        try {
-          const parsedUser = JSON.parse(currentUser);
-          userId = parsedUser.id;
-        } catch (error) {
-          console.error('Error parsing currentUser from localStorage:', error);
-          this.snackBar.open('Error retrieving user information.', 'Close', {
-            duration: 3000,
-          });
-          return;
-        }
-      }
-      if (!userId) {
-        this.snackBar.open('Unable to retrieve user information.', 'Close', {
-          duration: 3000,
-        });
-        return;
-      }
+      const formValue = this.transactionForm.getRawValue();
+      
+      // Transform tags from string to array if needed
+      const tags = formValue.tags ? formValue.tags.split(',').map((tag: string) => tag.trim()) : [];
       const transactionData = {
-        ...this.transactionForm.value,
-        propertyName: this.properties.find(p => p.id === this.transactionForm.value.propertyId)?.name,
-        userId
+        ...formValue,
+        tags,
+        date: new Date(formValue.date).toISOString(),
+        dueDate: formValue.dueDate ? new Date(formValue.dueDate).toISOString() : null,
+        approvedDate: formValue.approvedDate ? new Date(formValue.approvedDate).toISOString() : null,
       };
-  
-      this.transactionService.createTransaction(transactionData).subscribe({
-        next: (transaction) => {
-          this.snackBar.open('Transaction created successfully', 'Close', {
-            duration: 3000
-          });
+
+      // Determine if this is an edit or create based on presence of ID
+      const operation = this.isEdit ? 
+        this.transactionService.updateTransaction(transactionData, this.transId) :
+        this.transactionService.createTransaction(transactionData);
+
+      operation.subscribe({
+        next: (response) => {
+          console.log(`Transaction ${this.isEdit ? 'updated' : 'created'}:`, response);
+          this.snackBar.open(
+            `Transaction ${this.isEdit ? 'updated' : 'created'} successfully`, 
+            'Close', 
+            { duration: 3000 }
+          );
           this.loadTransactions();
           this.resetTransactionForm();
         },
         error: (error) => {
-          console.error('Error creating transaction:', error);
-          this.snackBar.open('Transaction saved locally', 'Close', {
-            duration: 3000
-          });
-          this.loadTransactions();
-          this.resetTransactionForm();
+          console.error(`Error ${this.isEdit ? 'updating' : 'creating'} transaction:`, error);
+          this.snackBar.open(
+            `Error ${this.isEdit ? 'updating' : 'creating'} transaction`, 
+            'Close', 
+            { duration: 3000 }
+          );
         }
       });
     }
   }
 
   resetTransactionForm(): void {
-    this.transactionForm.reset();
+    this.transactionForm.reset({
+      type: 'INCOME',
+      propertyId: 1,
+      propertyName: 'Luxury Villa',
+      category: 'BOOKING_PAYMENT',
+      status: 'PENDING',
+      approvalStatus: 'PENDING',
+      date: new Date().toISOString().split('T')[0],
+      recurring: false,
+      taxDetails: {
+        taxable: false,
+        taxAmount: 0,
+        deductible: false
+      },
+      metadata: {
+        source: 'web',
+        campaign: ''
+      }
+    });
     this.showTransactionForm = false;
   }
 
@@ -407,6 +455,45 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.snackBar.open('Storage cleared', 'Close', {
       duration: 3000
     });
+  }
+
+  editTransaction(transaction: Transaction): void {
+    // Format dates for form inputs
+    this.transId = transaction.id;
+    const formattedTransaction = {
+      ...transaction,
+      date: new Date(transaction.date).toISOString().split('T')[0],
+      dueDate: transaction.dueDate ? new Date(transaction.dueDate).toISOString().split('T')[0] : '',
+      approvedDate: transaction.approvedDate ? new Date(transaction.approvedDate).toISOString().split('T')[0] : '',
+      // Convert tags array to comma-separated string
+      tags: Array.isArray(transaction.tags) ? transaction.tags.join(', ') : '',
+      // Ensure nested objects exist
+      taxDetails: {
+        taxable: false,
+        taxCategory: '',
+        taxAmount: 0,
+        deductible: false,
+        deductionCategory: '',
+        ...transaction.taxDetails
+      },
+      metadata: {
+        source: 'web',
+        campaign: '',
+        ...transaction.metadata
+      }
+    };
+
+    // Reset form with existing values
+    this.transactionForm.patchValue(formattedTransaction);
+    this.isEdit = true;
+    
+    // Show the form
+    this.showTransactionForm = true;
+    
+    // Scroll to form
+    setTimeout(() => {
+      document.querySelector('.transaction-form')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
   }
 
   deleteTransaction(transaction: Transaction): void {
