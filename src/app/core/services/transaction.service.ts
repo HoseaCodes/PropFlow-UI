@@ -37,6 +37,8 @@ export class TransactionService {
   }
 
   getTransactions(): Observable<Transaction[]> {
+    console.log(environment.production)
+    console.log(environment.apiUrl)
     return this.authService.getCurrentUser().pipe(
       switchMap(currentUser => {
         if (!currentUser) {
